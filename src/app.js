@@ -5,6 +5,7 @@ const compression = require('compression');
 const countConnect = require('./helpers/check.connect');
 
 
+
 const app = express()
 
 // middlwear
@@ -16,14 +17,7 @@ app.use(compression())
 require('./dbs/conectdbs');
 countConnect()
 
-
-app.get('/', (req, res) => {
-    const message = "Hello World !!"
-
-    res.status(200).json({
-        mess: message
-    })
-})
+app.use('', require('./router'))
 
 
 module.exports = app;
