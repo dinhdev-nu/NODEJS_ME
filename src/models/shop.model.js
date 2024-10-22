@@ -1,7 +1,6 @@
 'use strict'
 
 const { model, Schema, Types} = require('mongoose');
-const Schema = mongoose.Schema
 const DOCUMENT_NAME = "Shop"
 const COLECTION_NAME = "Shops"
 // Declare the Schema of the Mongo model
@@ -26,7 +25,7 @@ var shopModel = new Schema({
         default: 'inactive'
     },
     verfify:{
-        type: mongoose.Schema.Types.Boolean,
+        type: Schema.Types.Boolean,
         default: false
     },
     roles:{
