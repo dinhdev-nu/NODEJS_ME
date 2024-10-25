@@ -5,11 +5,17 @@ const mongoose = require("mongoose")
 const DOCUMENT_NAME = "Key"
 const COLECTION_NAME = "Keys"
 
+
+// Tạo Keys
 const keyTokenSchema = new mongoose.Schema({
     user:{
         type: mongoose.Schema.Types.ObjectId,
         require: true,
         ref: 'Shops'
+    },
+    privateKey:{
+        type:String,
+        require: true,
     },
     publicKey:{
         type:String,

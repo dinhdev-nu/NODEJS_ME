@@ -6,6 +6,7 @@ const crypto = require('crypto')
 const KeyTokenService = require("./keyToken.service")
 const { createTokenPair } = require("../auth/authUtils")
 const { getInfoData } = require("../utils")
+const { ConflictRequestError, BadRequestError } = require("../core/error.respon")
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -14,18 +15,13 @@ const RoleShop = {
     ADIMIN: "ADMIN",
 }
 class AccessServices {
-
     // Đăng kí tk mới...
     static signup = async ({ name, email, password }) => {
-        try {
-
+        // try {
             // Check tk đã có chưa...
             const holderShop = await shopModel.findOne({ email }).lean()
             if(holderShop)
-                return { 
-                    code: "xxxx",
-                    message: "Shop already registered!!!"
-                }
+                throw new BadRequestError("Error: Shop already registered!!!")
 
             // Muốn tạo thì phải bảo mật: Mã hóa mật khẩu = bcrypt
             const passwordHash = await bcrypt.hash(password, 10)
@@ -41,35 +37,40 @@ class AccessServices {
              // Tạo 1 token cho shop (TK đăng nhập)
             if(newShop){
                 // Create privateKey(mk signToken), publicKey(mk verifyToken(xác thực))
-                const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-                    modulusLength: 4096, 
-                    publicKeyEncoding: {
-                        type: 'spki', // Định dạng cho public key
-                        format: 'pem' // Xuất ra định dạng PEM (chuỗi)
-                      },
-                      privateKeyEncoding: {
-                        type: 'pkcs8', // Định dạng cho private key
-                        format: 'pem'  // Xuất ra định dạng PEM (chuỗi)
-                      }
-                })
+                // lv bình thường
+                const privateKey = crypto.randomBytes(64).toString('hex')
+                const publicKey = crypto.randomBytes(64).toString('hex')
+                // LV Cao
+                // const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
+                //     modulusLength: 4096, 
+                //     publicKeyEncoding: {
+                //         type: 'spki', // Định dạng cho public key
+                //         format: 'pem' // Xuất ra định dạng PEM (chuỗi)
+                //       },
+                //       privateKeyEncoding: {
+                //         type: 'pkcs8', // Định dạng cho private key
+                //         format: 'pem'  // Xuất ra định dạng PEM (chuỗi)
+                //       }
+                // })
+
 
                 console.log({ privateKey, publicKey })
 
-                const publicKeyString = await KeyTokenService.createKeyToken({
+                const keyStore = await KeyTokenService.createKeyToken({
                     userID: newShop._id,
-                    publicKey
+                    publicKey, 
+                    privateKey
                 })
 
-                if(!publicKeyString){
+                if(!keyStore){
                     return {
                         nameError: "xxx",
-                         message: "publicKeyTring Error"
+                         message: "keyStore Error"
                     }
                 }
                 
-                const publicKeyObject = crypto.createPublicKey( publicKeyString )
                 // Created a pair of token
-                const tokens = await createTokenPair({userID: newShop._id, email}, publicKeyString, privateKey)
+                const tokens = await createTokenPair({userID: newShop._id, email}, publicKey, privateKey)
                 console.log(`Created Token Successfull:`, tokens)
 
                 return {
@@ -89,13 +90,13 @@ class AccessServices {
             
 
             
-        } catch (error) {
-            return {
-                nameError: "xxx",
-                message: error.message,
-                status: "error"
-            }
-        }
+        // } catch (error) {
+        //     return {
+        //         nameError: "xxx",
+        //         message: error.message,
+        //         status: "error"
+        //     }
+        // }
     }
 }
 

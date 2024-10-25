@@ -7,14 +7,12 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
     try {
 
         // Truy cập tài nguyên
-        const acceessToken = jwt.sign(payload, privateKey, {
-            algorithm: "RS256",
+        const acceessToken = jwt.sign(payload, publicKey, {
             expiresIn: "2 days"
         })
 
         // Lưu đăng nhập
         const refreshToken = jwt.sign(payload, privateKey, {
-            algorithm: "RS256",
             expiresIn: "7 days"
         })
 
