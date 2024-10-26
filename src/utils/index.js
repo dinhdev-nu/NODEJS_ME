@@ -2,8 +2,8 @@
 
 const _ = require('lodash')
 
-const getInfoData = ({feilds = [], object = {} }) => {
-    return _.pick( object, feilds)
+const  getInfoData = ({fileds = [], object = {} }) => {
+    return _.pick(object, fileds) 
 
 }
 
