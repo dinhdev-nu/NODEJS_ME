@@ -17,6 +17,12 @@ const RoleShop = {
 }
 class AccessServices {
 
+    static loguot = async (keyStore) => {
+        const delKey =  await KeyTokenService.removeTokenById(keyStore._id)
+        console.log( {delKey})
+        return delKey 
+    }
+
     static login = async ({ email, password, refreshToken = null}) => {
         // step 1: check email
         const foundShop = await findByEmail({email})
@@ -33,16 +39,15 @@ class AccessServices {
         const publicKey = crypto.randomBytes(64).toString('hex')
         
         // step4 : generate tokens
-        const {_is: userID} = foundShop
-        const tokens = await createTokenPair({userID, email}, publicKey, privateKey, refreshToken)
+        const tokens = await createTokenPair({userID: foundShop._id, email}, publicKey, privateKey)
         await KeyTokenService.createKeyToken({
            refreshToken: tokens.refreshToken,
-           privateKey, publicKey, userID      
+           privateKey, publicKey, userID: foundShop._id      
         })
         // step 5: getdata return login
         return {
             shop: getInfoData({fileds: ["_id", "name", "email"], object: foundShop}),
-             tokens
+            tokens
         }
     }
      

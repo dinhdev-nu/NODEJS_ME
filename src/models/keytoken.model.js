@@ -10,16 +10,16 @@ const COLECTION_NAME = "Keys"
 const keyTokenSchema = new mongoose.Schema({
     user:{
         type: mongoose.Schema.Types.ObjectId,
-        require: true,
+        required: true,
         ref: 'Shops'
     },
     privateKey:{
         type:String,
-        require: true,
+        required: true,
     },
     publicKey:{
         type:String,
-        require: true,
+        required: true,
     },
     refreshTokensUsed:{
         type: Array,
@@ -27,7 +27,7 @@ const keyTokenSchema = new mongoose.Schema({
     },
     refreshToken:{
         type: String,
-        require: true,
+        required: true,
     },
 
 },{
