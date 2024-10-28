@@ -14,6 +14,7 @@ const{
     StatusCodes,
     ReasonPhrases
 } = require('../utils/httpStatusCode')
+const reasonPhrases = require('../utils/reasonPhrases')
 
 class ErrorResponse extends Error {
     constructor(message, status){
@@ -43,10 +44,16 @@ class NotFoundError extends ErrorResponse {
         super(message, statusCode)
     }
 }
+class ForbiddenError extends ErrorResponse {
+    constructor(message = ReasonPhrases.FORBIDDEN, statusCode = StatusCodes.FORBIDDEN){
+        super(message, statusCode)
+    }
+}
 
 module.exports = {
     ConflictRequestError,
     BadRequestError,
     AuthFailureError, 
-    NotFoundError
+    NotFoundError,
+    ForbiddenError
 }

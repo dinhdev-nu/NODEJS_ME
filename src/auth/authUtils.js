@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const { asyncHandler } = require('../helpers/acsyncHandle')
 const { AuthFailureError, NotFoundError } = require('../core/error.respon')
 const { findByUserID } = require('../services/keyToken.service')
+const { token } = require('morgan')
 
 const HEADER = {
     API_KEY: 'x-api-key', // API key: key nay cap quyen
@@ -75,7 +76,12 @@ const authentication = asyncHandler(async (req, res, next) => {
     
 })
 
+const verifyJWT = async ( token, keySecret) => {
+    return await jwt.verify( token, keySecret)
+}
+
 module.exports = {
     createTokenPair,
-    authentication
+    authentication,
+    verifyJWT
 }
