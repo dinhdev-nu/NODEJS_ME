@@ -16,39 +16,67 @@ const RoleShop = {
     ADIMIN: "ADMIN",
 }
 class AccessServices {
+    // autenticationv1
+    static handleRefreshTokenv1 = async ({ keyStore, user, refreshToken }) => {
+        const {userID, email} = user;
 
-    static handleRefreshToken = async (refreshToken) => {
-        // check token user...
-        const foundTokenUsed = await KeyTokenService.findByRefreshTokenUsed(refreshToken)
-        // nếu có người sư dụng lại
-        if(foundTokenUsed){
-            // decode xem ai dang su dung refreshToken
-            const { userID, email } = await verifyJWT(refreshToken, foundTokenUsed.privateKey)
-            console.log({ userID, email })
-            // xóa tất cả token trong keyStore 
+        if(keyStore.refreshTokensUsed.includes(refreshToken)){
             await KeyTokenService.deleteKeyByID(userID)
             throw new ForbiddenError("Something Wrong Happend! Pls relogin ")
         }
-        // nếu không...
-        const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
-        if(!holderToken)
-            throw new AuthFailureError("Shop not registered!! ")
-        const { userID, email } = await verifyJWT(refreshToken, holderToken.privateKey)
+
+        if(keyStore.refreshToken !== refreshToken)
+           throw new AuthFailureError("Shop not registered!! ")
         const foundShop = await findByEmail({email}) 
         if(!foundShop)
-           throw new AuthFailureError("Shop not registered!! ")
-        //create a new pair of Token
-        const tokens = await createTokenPair({userID, email}, holderToken.publicKey, holderToken.privateKey)
-        // update token
-        holderToken.refreshToken = tokens.refreshToken
-        holderToken.refreshTokensUsed.push(refreshToken)
-        await holderToken.save()
-
-        return {
-            user: { userID, email },
-            tokens,
-        }
+            throw new AuthFailureError("Shop not registered!! ")
+         //create a new pair of Token
+         const tokens = await createTokenPair({userID, email}, keyStore.publicKey, keyStore.privateKey)
+         // update token
+         keyStore.refreshToken = tokens.refreshToken
+         keyStore.refreshTokensUsed.push(refreshToken)
+         await keyStore.save()
+ 
+         return {
+             user,
+             tokens,
+         }
+    
     }
+
+    // // authentication
+    // static handleRefreshToken = async (refreshToken) => {
+    //     // check token user...
+    //     const foundTokenUsed = await KeyTokenService.findByRefreshTokenUsed(refreshToken)
+    //     // nếu có người sư dụng lại
+    //     if(foundTokenUsed){
+    //         // decode xem ai dang su dung refreshToken
+    //         const { userID, email } = await verifyJWT(refreshToken, foundTokenUsed.privateKey)
+    //         console.log({ userID, email })
+    //         // xóa tất cả token trong keyStore 
+    //         await KeyTokenService.deleteKeyByID(userID)
+    //         throw new ForbiddenError("Something Wrong Happend! Pls relogin ")
+    //     }
+    //     // nếu không...
+    //     const holderToken = await KeyTokenService.findByRefreshToken(refreshToken)
+    //     if(!holderToken)
+    //         throw new AuthFailureError("Shop not registered!! ")
+    //     const { userID, email } = await verifyJWT(refreshToken, holderToken.privateKey)
+    //     const foundShop = await findByEmail({email}) 
+    //     if(!foundShop)
+    //        throw new AuthFailureError("Shop not registered!! ")
+    //     //create a new pair of Token
+    //     const tokens = await createTokenPair({userID, email}, holderToken.publicKey, holderToken.privateKey)
+    //     // update token
+    //     holderToken.refreshToken = tokens.refreshToken
+    //     holderToken.refreshTokensUsed.push(refreshToken)
+    //     await holderToken.save()
+
+    //     return {
+    //         user: { userID, email },
+    //         tokens,
+    //     }
+    // }
 
     static loguot = async (keyStore) => {
         const delKey =  await KeyTokenService.removeTokenById(keyStore._id)

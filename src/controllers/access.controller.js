@@ -5,10 +5,23 @@ const AccessServices = require("../services/access.services");
 
 
 class AccessControllers {
+    // sai authetication thuong
+    // handleRefreshToken = async (req, res, next) =>{
+    //     new SuccessResponse({
+    //         message: 'Get Token Success!',
+    //         metadata: await AccessServices.handleRefreshToken( req.body.refreshToken )
+    //     }).send(res)
+    // }
+    
+    //v1  fix, no user accessstoken
     handleRefreshToken = async (req, res, next) =>{
         new SuccessResponse({
             message: 'Get Token Success!',
-            metadata: await AccessServices.handleRefreshToken( req.body.refreshToken )
+            metadata: await AccessServices.handleRefreshTokenv1( {
+                refreshToken: req.refreshToken,
+                user: req.user,
+                keyStore: req.keyStore
+            } )
         }).send(res)
     }
     logout = async (req, res, next) =>{
