@@ -7,7 +7,7 @@ const COLECTION_NAME = "Products"
 const productSchema = new mongoose.Schema({
     product_name: { type: String, required: true },
     product_thumb: { type: String, required: true },
-    pooduct_desciption: { type: String},
+    product_description: { type: String},
     product_price: { type: Number, required: true },
     product_quantity: { type: Number, required: true },
     product_type: { type: String, required: true , enum: ["Electronics", "Clothing"]},
