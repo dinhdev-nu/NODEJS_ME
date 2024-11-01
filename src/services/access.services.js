@@ -148,7 +148,7 @@ class AccessServices {
                 })
 
                 if(!keyStore){
-                    throw new BadRequestError("Error: KeyStore Erro!!!")
+                    throw new BadRequestError("Error: KeyStore Error!!!")
                 }
                 
                 // Created a pair of token
@@ -166,7 +166,9 @@ class AccessServices {
             // Trả về thông tin shop mới tạo và token (hoặc privateKey/publicKey)
             return {
                 code: 200,
-                metadata: null,
+                metadata: {
+                    message: "LOi"
+                },
             }
     }
 }
