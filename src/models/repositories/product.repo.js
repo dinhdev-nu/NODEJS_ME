@@ -1,6 +1,6 @@
 'use strict'
 
-const { getSelectData } = require("../../utils")
+const { getSelectData, unGetSelectData } = require("../../utils")
 const { product } = require("../product.model")
 
 // GET query
@@ -30,8 +30,13 @@ const findAllProducts = async ({limit, page, sort, filter, select}) => {
         .limit(limit)
         .select(getSelectData(select))
         .lean()
+    return products
 }
-
+const findProduct = async ({product_id, unSelect}) => {
+    return await product.findById(product_id)
+        .select(unGetSelectData(unSelect))
+        .lean()
+}
 
 // PUT 
 const publishProductByShop = async( {product_shop, product_id} ) => {
@@ -78,5 +83,6 @@ module.exports = {
     findAllPublishsForShop,
     unPublishProductByShop, 
     searchProductByUser,
-    findAllProducts
+    findAllProducts,
+    findProduct
 }

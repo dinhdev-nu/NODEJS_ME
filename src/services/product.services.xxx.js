@@ -7,7 +7,8 @@ const { findAllDraftsForShop,
         findAllPublishsForShop, 
         unPublishProductByShop, 
         searchProductByUser, 
-        findAllProducts} = require("../models/repositories/product.repo")
+        findAllProducts,
+        findProduct} = require("../models/repositories/product.repo")
 
 class ProductFactoryV2 {
 
@@ -37,7 +38,11 @@ class ProductFactoryV2 {
         return await searchProductByUser(keySearch);
     }
     static async findAllProducts({limit = 50, page = 1, sort = 'ctime', filter = { isPublish: true }}){
-        return await findAllProducts({ limit, sort, page ,filter, select: ['product_name', 'product_price', 'product_thumb']})
+        return await findAllProducts({ limit, sort, page ,filter, 
+            select: ['product_name', 'product_price', 'product_thumb']})
+    }
+    static async findProduct({product_id}){
+        return await findProduct({  product_id, unSelect: ['__v'] })
     }
 
     // PUT

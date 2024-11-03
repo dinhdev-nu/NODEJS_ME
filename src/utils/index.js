@@ -8,8 +8,13 @@ const  getInfoData = ({fileds = [], object = {} }) => {
 }
 const getSelectData = (select = []) => {
    return Object.fromEntries(select.map(sl => [sl,1]))
+   // or return sleect.join(' ')
 }
+const unGetSelectData = (select = []) => {
+    return Object.fromEntries(select.map(sl => [sl,0]))
+ }
 module.exports = {
     getInfoData,
-    getSelectData
+    getSelectData,
+    unGetSelectData
 }
