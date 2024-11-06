@@ -37,7 +37,12 @@ const findProduct = async ({product_id, unSelect}) => {
         .select(unGetSelectData(unSelect))
         .lean()
 }
-
+// PATCH
+const updateProductByID = async ({product_id, bodyUpdate, modelName, isNew = true}) => {
+    return await modelName.findByIdAndUpdate(product_id, bodyUpdate, {
+        new: isNew
+    })
+}
 // PUT 
 const publishProductByShop = async( {product_shop, product_id} ) => {
 
@@ -58,7 +63,7 @@ const unPublishProductByShop = async( {product_shop, product_id} ) => {
         product_shop, 
         _id: product_id
     })
-    if(!foundShop)
+    if(!foundShop)      
         return null
     foundShop.isDraft = true
     foundShop.isPublish = false
@@ -84,5 +89,6 @@ module.exports = {
     unPublishProductByShop, 
     searchProductByUser,
     findAllProducts,
-    findProduct
+    findProduct,
+    updateProductByID
 }

@@ -69,6 +69,16 @@ class ProductController {
             metadata: await ProductFactoryV2.searchProducts(req.params.keysearch)
         }).send(res)
     }
+    //PATCH
+    updateProduct = async (req, res, next) => {
+        new SuccessResponse({
+            message: 'UpdateProduct success!',
+            metadata: await ProductFactoryV2.updateProduct(req.body.product_type, req.params.product_id, {
+                ...req.body,
+                product_shop: req.user.userID
+            })
+        }).send(res)
+    }
 
     // PUT
     publishProductByShop = async (req, res, next) => {

@@ -2,13 +2,16 @@
 
 const { BadRequestError } = require("../core/error.respon")
 const { product, clothing, electronic, furniture } = require("../models/product.model")
+const { insertInventory } = require("../models/repositories/inventory.repo")
 const { findAllDraftsForShop, 
         publishProductByShop, 
         findAllPublishsForShop, 
         unPublishProductByShop, 
         searchProductByUser, 
         findAllProducts,
-        findProduct} = require("../models/repositories/product.repo")
+        findProduct,
+        updateProductByID} = require("../models/repositories/product.repo")
+const { removeTrashInObject, nestRemoveUndefinedObject } = require("../utils")
 
 class ProductFactoryV2 {
 
@@ -44,8 +47,14 @@ class ProductFactoryV2 {
     static async findProduct({product_id}){
         return await findProduct({  product_id, unSelect: ['__v'] })
     }
-
-    // PUT
+    // PATCH update some field in db
+    static async updateProduct( type, product_id, data ){
+        const productClass = ProductFactoryV2.productRegistry[type]
+        if(!productClass)
+            throw new BadRequestError(`Invalid Product Type!! ${type}`)
+        return new productClass(data).updateProduct(product_id)
+    }
+    // PUT update all field in db or db ? update : newdb
     static async publishProductByShop({product_shop, product_id}){
         return await publishProductByShop({ product_shop, product_id})
     } 
@@ -53,7 +62,7 @@ class ProductFactoryV2 {
         return await unPublishProductByShop({ product_shop, product_id})
     } 
 } 
-
+ 
 
 // tạo 1 db chung ở db product
 class Product {  
@@ -72,12 +81,23 @@ class Product {
     }
 
     async createProduct(product_id){
-        return await product.create({
+        const newProduct = await product.create({
             ...this,
             _id: product_id
         })
+        if(newProduct){
+            await insertInventory({
+                productId: newProduct._id,
+                shopId: this.product_shop,
+                stock: this.product_quantity
+            })
+        }
+        return newProduct
     }
-
+    async updateProduct(product_id, bodyUpdate){
+        return await updateProductByID({product_id, bodyUpdate, modelName: product})
+    }
+    
 }
 
 // class con rieng trong db khac
@@ -95,6 +115,16 @@ class Clothing extends Product{
         if(!newProduct)
             throw new BadRequestError("Create new Product error!")
         return newProduct
+    }
+
+    async updateProduct( product_id ){
+        const objectPrams = removeTrashInObject(this)
+        if(objectPrams.product_attributes){
+            const bodyUpdate = objectPrams.product_attributes
+            await updateProductByID({product_id, bodyUpdate, modelName: clothing})
+        }
+        const updateProduct = await super.updateProduct(product_id, nestRemoveUndefinedObject(objectPrams))
+        return updateProduct 
     }
 }
 class Furniture extends Product{
