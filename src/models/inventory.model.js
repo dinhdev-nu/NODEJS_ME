@@ -1,6 +1,5 @@
 'use strict'
 
-const { defaultTo } = require("lodash")
 const mongoose = require("mongoose") 
 
 const DOCUMENT_NAME = "Inventory"
