@@ -27,9 +27,16 @@ const updateUserCartQuanity = async({userId, product}) => {
     option = { upsert: true, new: true}
     return await cart.findOneAndUpdate(query, updateset, option)
 }
+// cart checkout
+
+const findCartById = async (cartId) =>{
+    return await cart.findOne({_id: cartId, cart_state: 'active'}).lean()
+}
 
 
 module.exports = {
     createUserCart,
-    updateUserCartQuanity
+    updateUserCartQuanity,
+    findCartById
+
 }

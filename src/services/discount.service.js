@@ -137,8 +137,7 @@ class DiscountService {
         if(new Date() < new Date(discount_start_date) || new Date() > new Date(discount_end_date)){
             throw new NotFoundError('discount has expried')
         }
-        let totalOrder = 10
-        console.log(totalOrder)
+        let totalOrder = 0
         if(discount_min_order_value > 0){
             totalOrder = products.reduce((acc, product) => {
                 return acc + (product.quantity * product.price)
